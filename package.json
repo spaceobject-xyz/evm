@@ -1,0 +1,15 @@
+{
+	"name": "@spaceobject/evm",
+	"version": "1.0.0",
+	"devDependencies": {
+		"solhint": "^5.1"
+	},
+	"scripts": {
+		"clean": "rm -rf cache out",
+		"build": "forge build",
+		"check": "forge fmt --check",
+		"format": "forge fmt",
+		"lint": "bun solhint \"{script,src,tests}/**/*.sol\"",
+		"test": "forge test"
+	}
+}
