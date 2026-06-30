@@ -38,7 +38,7 @@ contract SpaceObjectTest is Test {
     function _relay() internal view returns (SpaceObject.Relay memory r) {
         r = SpaceObject.Relay({
             taker: hex"0102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f20",
-            tokenIn: hex"deadbeef",
+            tokenIn: hex"00000000000000000000000000000000000000000000000000000000deadbeef",
             amountIn: 1_000,
             tokenOut: bytes32(uint256(uint160(address(token)))),
             amountOut: 590,

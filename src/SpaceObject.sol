@@ -28,12 +28,14 @@ contract SpaceObject is Ownable, Pausable, ReentrancyGuard {
     /// chain), whereas the origin must be carried so the later origin-chain
     /// repayment can be routed. {originChain} is metadata only — it is NOT part of
     /// the order-id preimage (the source order commits to `dest_chain`, not the
-    /// origin). `taker` and `tokenIn` are origin-chain identifiers carried as the
-    /// raw bytes the origin chain committed to. `tokenOut` and `recipient` are
-    /// this chain's addresses in 32-byte form (left-padded, high bytes zero).
+    /// origin). `taker` and `tokenIn` are origin-chain (Stellar) identifiers
+    /// carried as the raw 32-byte payload the origin chain committed to — the
+    /// ed25519 key of a `G…` account or the contract-id hash of a `C…` contract,
+    /// with no XDR framing. `tokenOut` and `recipient` are this chain's addresses
+    /// in 32-byte form (left-padded, high bytes zero).
     struct Relay {
-        bytes taker;
-        bytes tokenIn;
+        bytes32 taker;
+        bytes32 tokenIn;
         uint128 amountIn;
         bytes32 tokenOut;
         uint128 amountOut;
@@ -173,8 +175,8 @@ contract SpaceObject is Ownable, Pausable, ReentrancyGuard {
 
     /// @dev Content id: `keccak256` over the fixed-layout preimage of the order's
     /// terms. Layout, concatenated with no padding or length prefixes:
-    /// `taker ‖ tokenIn ‖ amountIn:be16 ‖ tokenOut:32 ‖ amountOut:be16 ‖
-    /// recipient:32 ‖ destChain:be4 ‖ deadline:be8 ‖ nonce:be8`.
+    /// `taker:32 ‖ tokenIn:32 ‖ amountIn:be16 ‖ tokenOut:32 ‖ amountOut:be16 ‖
+    /// recipient:32 ‖ destChain:be8 ‖ deadline:be8 ‖ nonce:be8`.
     /// This must match the source-chain `order_id` byte-for-byte.
     function _orderId(
         Relay calldata relay,
