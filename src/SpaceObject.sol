@@ -38,7 +38,7 @@ contract SpaceObject is Ownable, Pausable, ReentrancyGuard {
         bytes32 tokenOut;
         uint128 amountOut;
         bytes32 recipient;
-        uint32 originChain;
+        uint64 originChain;
         uint64 deadline;
         uint64 nonce;
     }
@@ -47,7 +47,7 @@ contract SpaceObject is Ownable, Pausable, ReentrancyGuard {
     struct FillReceipt {
         address solver;
         bytes32 repaymentAddress;
-        uint32 originChain;
+        uint64 originChain;
         uint64 filledAt;
     }
 
@@ -58,7 +58,7 @@ contract SpaceObject is Ownable, Pausable, ReentrancyGuard {
     event OrderFilled(
         bytes32 indexed orderId,
         address indexed solver,
-        uint32 indexed originChain,
+        uint64 indexed originChain,
         bytes32 repaymentAddress,
         address tokenOut,
         address recipient,
@@ -99,7 +99,7 @@ contract SpaceObject is Ownable, Pausable, ReentrancyGuard {
         // 2 & 3. Rebuild the content id, pinning the destination to THIS chain. A
         // match proves the relayed terms are authentic AND that the order's
         // `dest_chain` equals `block.chainid` (i.e. it targets this chain).
-        bytes32 computed = _orderId(relay, uint32(block.chainid));
+        bytes32 computed = _orderId(relay, uint64(block.chainid));
         if (computed != orderId) {
             revert OrderIdMismatch(orderId, computed);
         }
@@ -110,7 +110,7 @@ contract SpaceObject is Ownable, Pausable, ReentrancyGuard {
         }
 
         // Effects: record the fill before the external transfer (CEI + nonReentrant).
-        uint32 originChain = relay.originChain;
+        uint64 originChain = relay.originChain;
         _fills[orderId] = FillReceipt({
             solver: msg.sender,
             repaymentAddress: repaymentAddress,
@@ -138,13 +138,13 @@ contract SpaceObject is Ownable, Pausable, ReentrancyGuard {
 
     /// @notice Order id for `relay` as filled on THIS chain (uses `block.chainid`).
     function orderIdFor(Relay calldata relay) external view returns (bytes32) {
-        return _orderId(relay, uint32(block.chainid));
+        return _orderId(relay, uint64(block.chainid));
     }
 
     /// @notice Order id for `relay` against an explicit `destChain` (off-chain tooling).
     function orderIdFor(
         Relay calldata relay,
-        uint32 destChain
+        uint64 destChain
     ) external pure returns (bytes32) {
         return _orderId(relay, destChain);
     }
@@ -178,7 +178,7 @@ contract SpaceObject is Ownable, Pausable, ReentrancyGuard {
     /// This must match the source-chain `order_id` byte-for-byte.
     function _orderId(
         Relay calldata relay,
-        uint32 destChain
+        uint64 destChain
     ) private pure returns (bytes32) {
         return
             keccak256(

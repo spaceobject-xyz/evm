@@ -60,7 +60,7 @@ contract SpaceObjectTest is Test {
                     r.tokenOut,
                     r.amountOut,
                     r.recipient,
-                    uint32(block.chainid),
+                    uint64(block.chainid),
                     r.deadline,
                     r.nonce
                 )
@@ -77,7 +77,7 @@ contract SpaceObjectTest is Test {
     function test_OrderIdForMatchesReconstruction() public view {
         SpaceObject.Relay memory r = _relay();
         assertEq(so.orderIdFor(r), _id(r));
-        assertEq(so.orderIdFor(r), so.orderIdFor(r, uint32(block.chainid)));
+        assertEq(so.orderIdFor(r), so.orderIdFor(r, uint64(block.chainid)));
     }
 
     // ---- fill: happy path ----
@@ -162,7 +162,7 @@ contract SpaceObjectTest is Test {
     /// is unfillable here even though every other field is identical.
     function test_FillRevertsOnWrongDestinationChain() public {
         SpaceObject.Relay memory r = _relay();
-        bytes32 foreignId = so.orderIdFor(r, uint32(block.chainid) + 1);
+        bytes32 foreignId = so.orderIdFor(r, uint64(block.chainid) + 1);
 
         vm.prank(solver);
         vm.expectRevert(
